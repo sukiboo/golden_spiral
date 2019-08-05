@@ -10,9 +10,9 @@ np.set_printoptions(precision=3, linewidth=115, suppress=True, formatter={'float
 
 
 ''' input setting '''
-dim = 2
-obj = 's'
-num_points = 1000
+dim = 5
+obj = 'b'
+num_points = 100
 
 
 ''' initialize the variables '''
@@ -23,10 +23,10 @@ print('\nselecting {:d} points from {:d}-{:s}'.format(num_points, dim, obj))
 # find the corresponding generalized golden ratio
 d_phi = construct.generalized_golden_ratio(dim)
 seed = np.array([d_phi**n for n in range(1,dim)])
+
 # generate low-discrepancy sequences
 seq = construct.ggs_sequences(seed, num_points)
-
-# measure correlation between and discrepancy
+# measure correlation and discrepancy
 me.sequence_correlation(seq)
 me.sequence_discrepancy(seq)
 
@@ -34,16 +34,17 @@ me.sequence_discrepancy(seq)
 ''' construct the points '''
 points = construct.ggs_points(obj, seq)
 
+plot_points.plot_sequences(seq, animate=True)
 
-''' analyze and plot the points '''
-# display various measurements
-st_ggs = me.display_stats(dim, obj, points)
-# plot the constructed points
-plot_points.plot_points(dim, obj, points, animate=False, save=False)
+# #''' analyze and plot the points '''
+# ## display various measurements
+# #st_ggs = me.display_stats(dim, obj, points)
+# ## plot the constructed points
+# #plot_points.plot_points(dim, obj, points, animate=False, save=False)
 
 
-''' compare to random points '''
-time.sleep(1)
-st_rnd = compare.random_points(dim, obj, num_points, animate=False, save=False)
+# #''' compare to random points '''
+# #time.sleep(1)
+# #st_rnd = compare.random_points(dim, obj, num_points, animate=False, save=False)
 
 

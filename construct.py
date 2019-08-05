@@ -39,7 +39,7 @@ def ggs_sequences(d_phi, num_points):
 	ind = np.arange(num_points)
 	seq = np.zeros((d_phi.size+1, num_points))
 	for n in range(d_phi.size):
-		seq[n] = ind / d_phi[n] % 1
+		seq[n] = (ind / d_phi[n]) % 1
 	seq[-1] = (ind + .5) / num_points
 
 	return seq
@@ -173,85 +173,6 @@ def invert_function(f, df, n, y, x0):
 	return x
 
 
-
-''' find (x) such that f(x)=y '''
-def pisoso_before_i_fucked_it_up(f, df, n, y, x0):
-
-	# direct and inverse rearrangings
-	ind_dir = y.argsort()
-	ind_inv = np.arange(y.size)[ind_dir].argsort()
-	# sorted and scale the sequence
-	s = y[ind_dir]
-
-	# derivative threshold and corresponding x value
-	eps = 1e-03
-	x_eps = np.arcsin(eps**(1/n))
-	# split the sequence into 3 regions based on x_eps
-	s_init = np.linspace(0, 1, s.size, endpoint=False)
-	num_x = 1+s_init.searchsorted([f(x_eps)])[0]
-	s0, s1, s2 = np.split(s, [num_x, s.size-num_x])
-	# #print(s0.size, s1.size, s2.size)
-
-	# approximate sin(x)**n by x**n where x is smaller than x_eps
-	p0 = ((n+1) * s0)**(1/(n+1))
-	if s0.size > 0:
-		print('p0: {:.2e}, {:d}'.format(np.max(np.abs(f(p0) - s0)), p0.size))
-
-	# approximate sin(x)**n by (pi-x)**n where x is larger than pi-x_eps
-	p2 = np.pi - ((n+1) * (1 - s2))**(1/(n+1))
-	if s2.size > 0:
-		print('p2: {:.2e}, {:d}'.format(np.max(np.abs(f(p2) - s2)), p2.size))
-
-	# invert distribution by newton method on (x_eps, pi-x_eps)
-	p1 = scipy.optimize.newton(\
-			lambda x: f(x) - s1, \
-			np.sort(x0)[num_x : num_x+s1.size],
-			# #np.sort(pts[n-1])[num_x : num_x+s1.size],
-			fprime = lambda x: df(x),
-			maxiter = 1000)
-	print('p1: {:.2e}, {:d}'.format(np.max(np.abs(f(p1) - s1)), p1.size))
-
-	# merge and rearrange the points
-	x = np.concatenate([p0,p1,p2])[ind_inv]
-
-	return x
-
-
-
-
-
-
-
-
-''' compute functions I[n] = int(0,x) sin(x)**n dx '''
-def compute_I_n(dim):
-
-	import sympy as sym
-	x = sym.symbols('x')
-
-	I = {}
-	for n in range(dim):
-		I[n] = sym.lambdify(x, sym.integrate(sym.sin(x)**n, (x, 0, x)))
-
-
-	# #import matplotlib.pyplot as plt
-	# #import plot_points
-	# #fig = plt.figure(figsize=(12,8))
-	# #colors = ['#ef476f', '#ffd166', '#06d6a0', '#4488ff', '#ef476f', '#ffc43d', '#06d6a0', '#8844ff']
-	# #xx = np.linspace(0, np.pi, 1000)
-	# #for n in range(len(I)):
-		# #plt.plot(xx, I[n](xx) / I[n](np.pi), color=colors[n], linewidth=2, \
-			# #label=r'${:s}$'.format('I_'+str(n)) + r'($\phi$)')
-	# #plt.legend()
-	# #plt.tight_layout()
-	# #plot_points.save_plot()
-	# #plt.show()
-
-	return I
-
-
-
-
 ''' find the upper d-golden ratio '''
 def generalized_upper_golden_ratio(d, max_iter=1000):
 
@@ -276,15 +197,4 @@ def generalized_upper_golden_ratio(d, max_iter=1000):
 	print('generalized golden ratio d_phi = {:.15f}'.format(x))
 
 	return x
-
-
-
-
-
-
-
-
-
-
-
 
