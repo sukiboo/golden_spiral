@@ -32,7 +32,7 @@ def plot_points(dim, obj, pts, cmap='winter', color='dodgerblue', animate=False,
 	if (obj in ['sphere','s'] and dim==1) or (obj in ['ball','b'] and dim==2):
 
 		# set up figure and configure axes
-		fig = plt.figure(figsize=(9.4,9.4))
+		fig = plt.figure(figsize=(10,10))
 		ax = plt.axes()
 		ax.set_axis_off()
 		ax.set_xlim(-1.1,1.1)
@@ -42,6 +42,10 @@ def plot_points(dim, obj, pts, cmap='winter', color='dodgerblue', animate=False,
 
 		# plot the points
 		ax.scatter(pts[:,0], pts[:,1], color=color)
+		# plot the unit circle
+		tt = np.linspace(0, 2*np.pi, 1000)
+		ax.scatter(np.sin(tt), np.cos(tt), color='turquoise', alpha=.5, s=1)
+
 		# show the plot
 		plt.tight_layout()
 		# save or show the plot
@@ -56,7 +60,7 @@ def plot_points(dim, obj, pts, cmap='winter', color='dodgerblue', animate=False,
 	elif (obj in ['sphere','s'] and dim==2) or (obj in ['ball','b'] and dim==3):
 
 		# set up figure and configure axes
-		fig = plt.figure(figsize=(9.4,9.4))
+		fig = plt.figure(figsize=(10,10))
 		ax = plt.axes(projection='3d')
 		ax.set_axis_off()
 		ax.view_init(azim=30, elev=-90)#150)#-90)
@@ -105,15 +109,18 @@ def save_animation(anim):
 def plot_lattice(pts0, pts1, color='dodgerblue', save=False):
 
 	# set up figure and configure axes
-	fig = plt.figure(figsize=(9.4,9.4))
+	fig = plt.figure(figsize=(10,10))
 	ax = plt.axes()
 	ax.set_xlim(-.01, 1.01)
-	ax.set_xticks([0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
 	ax.set_ylim(-.01, 1.01)
-	ax.set_yticks([0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
+	ax.set_xticks([])
+	ax.set_yticks([])
 
 	# plot the points
 	ax.scatter(pts0, pts1, color=color)
+	ax.scatter(pts0, np.zeros(pts0.shape)-.005, color='firebrick', marker='|')
+	ax.scatter(np.zeros(pts1.shape)-.005, pts1, color='firebrick', marker='_')
+
 	# show the plot
 	plt.tight_layout()
 	# save or show the plot
@@ -155,15 +162,22 @@ def plot_sequences(seq, animate=False):
 			# plot points
 			for n in range(num_seq):
 				ax.scatter(seq[n,:frame+1], y_crd[n,:frame+1])
+			# highlight the largest interval
+			ss = np.append(np.sort(seq[0,:frame+1]), 1)
+			# #delta = ss[1:] - ss[:-1]
+			# #ii = delta.argmax()
+			ii = np.argmax(ss[1:] - ss[:-1])
+			ax.scatter(np.linspace(ss[ii], ss[ii+1], seq.shape[1]+2)[1:-1],\
+				y_crd[0,:seq.shape[1]], marker='_', alpha=.5)
 
 			return fig,
 
 		# display animation
 		anim = animation.FuncAnimation(fig, plot_frame, frames=num_pts, interval=100)
-		# #anim.save('./animation/' + str(num_seq) + '_' + str(num_pts) + '.gif',\
-			# #writer='imagemagick', fps=10/num_pts, dpi=100)
-		anim.save('./animation/' + str(num_seq) + '_' + str(num_pts) + '.mp4',\
-			writer='ffmpeg', fps=num_pts/10)
+		anim.save('./animation/' + str(num_seq) + '_' + str(num_pts) + '.gif',\
+			writer='imagemagick', fps=num_pts/10, dpi=100)
+		# #anim.save('./animation/' + str(num_seq) + '_' + str(num_pts) + '.mp4',\
+			# #writer='ffmpeg', fps=num_pts/10)
 
 	else:
 		# plot points

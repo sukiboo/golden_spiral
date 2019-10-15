@@ -17,7 +17,7 @@ def sequence_correlation(seq):
 	return
 
 
-def sequence_discrepancy(seq, num_tests=100):
+def sequence_discrepancy(seq, num_tests=10000):
 
 	d, num_points = seq.shape
 	a = np.linspace(0, 1, num_tests+1)[1:]

@@ -39,7 +39,7 @@ def ggs_sequences(d_phi, num_points):
 	ind = np.arange(num_points)
 	seq = np.zeros((d_phi.size+1, num_points))
 	for n in range(d_phi.size):
-		seq[n] = (ind / d_phi[n]) % 1
+		seq[n] = ind * d_phi[n] % 1
 	seq[-1] = (ind + .5) / num_points
 
 	return seq
@@ -198,3 +198,84 @@ def generalized_upper_golden_ratio(d, max_iter=1000):
 
 	return x
 
+
+def generate_lattice(step, alpha, num_points):
+	seq = np.zeros((2,num_points))
+	ind = np.arange(num_points) * step
+	seq[0] = ind * np.cos(alpha * np.pi/180) % 1
+	seq[1] = ind * np.sin(alpha * np.pi/180) % 1
+	return seq
+
+def interactive_lattice(seq, alpha, step):
+
+	num_points = seq.shape[1]
+
+	import matplotlib.pyplot as plt
+	from matplotlib.widgets import Slider, Button, TextBox
+	from matplotlib import animation
+
+	# set up figure and configure axes
+	fig = plt.figure(figsize=(10,11))
+	plt.subplots_adjust(left=.05, right=.95, bottom=.15, top=.96)
+	def plot_lattice(pts0, pts1, color='dodgerblue', save=False):
+		ax = plt.axes()
+		ax.set_xlim(-.01, 1.01)
+		ax.set_ylim(-.01, 1.01)
+		ax.set_xticks([])
+		ax.set_yticks([])
+		# plot the points
+		plot = ax.scatter(pts0, pts1, color=color)
+		xtick = ax.scatter(pts0, np.zeros(pts0.shape)-.005, color='firebrick', marker='|')
+		ytick = ax.scatter(np.zeros(pts1.shape)-.005, pts1, color='firebrick', marker='_')
+		return plot, xtick, ytick
+
+	plot, xtick, ytick = plot_lattice(seq[0], seq[1])
+	alpha_axes = plt.axes([.075, .1, .85, .025])
+	alpha_slider = Slider(alpha_axes, 'angle', 0, 45, valinit=alpha)
+	step_axes = plt.axes([.075, .06, .85, .025])
+	step_slider = Slider(step_axes, 'step', 0, np.sqrt(2), valinit=step)
+	# buttons that change the number of points
+	num_minus_axes = plt.axes([.78, .01, .065, .04])
+	num_minus_button = Button(num_minus_axes, '-1')
+	num_plus_axes = plt.axes([.86, .01, .065, .04])
+	num_plus_button = Button(num_plus_axes, '+1')
+	# number of points
+	num_points_axes = plt.axes([.7, .01, .065, .04])
+	points_button = TextBox(num_points_axes, 'number of points:', initial=str(num_points), label_pad=.1)
+
+	# update the plot on a slider update
+	def slider_update(_):
+		seq = generate_lattice(step_slider.val, alpha_slider.val, int(points_button.text))
+		plot.set_offsets(seq.T)
+		xtick.set_offsets(np.array([seq[0], np.zeros(seq[0].shape)-.005]).T)
+		ytick.set_offsets(np.array([np.zeros(seq[1].shape)-.005, seq[1]]).T)
+		fig.canvas.draw_idle()
+	def points_minus(_):
+		points_button.set_val(int(points_button.text) - 1)
+		points_button.stop_typing()
+	def points_plus(_):
+		points_button.set_val(int(points_button.text) + 1)
+		points_button.stop_typing()
+
+	# update the plot
+	alpha_slider.on_changed(slider_update)
+	step_slider.on_changed(slider_update)
+	points_button.on_submit(slider_update)
+	num_minus_button.on_clicked(points_minus)
+	num_plus_button.on_clicked(points_plus)
+
+	# show the plot
+	plt.show()
+
+	# update and return the sequence
+	seq = generate_lattice(step_slider.val, alpha_slider.val, int(points_button.text))
+	return seq
+
+def seq_ratio(N, r):
+	seq = np.zeros(N)
+	for n in range(N-1):
+		seqs = np.concatenate([np.sort(seq[:n+1]), (1,)])
+		seqs_d = seqs[1:] - seqs[:-1]
+		k = np.argmax(seqs_d)
+		seq[n+1] = (seqs[k] + r*seqs[k+1]) / (1 + r)
+	return seq
