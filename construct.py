@@ -277,5 +277,5 @@ def seq_ratio(N, r):
 		seqs = np.concatenate([np.sort(seq[:n+1]), (1,)])
 		seqs_d = seqs[1:] - seqs[:-1]
 		k = np.argmax(seqs_d)
-		seq[n+1] = (seqs[k] + r*seqs[k+1]) / (1 + r)
+		seq[n+1] = (1-r)*seqs[k] + r*seqs[k+1]
 	return seq

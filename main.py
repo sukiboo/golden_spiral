@@ -12,7 +12,7 @@ np.set_printoptions(precision=3, linewidth=115, suppress=True, formatter={'float
 ''' input setting '''
 dim = 2
 obj = 's'
-num_points = 256
+num_points = 100
 
 
 ''' initialize the variables '''
@@ -28,8 +28,9 @@ seed = np.array([d_phi**n for n in range(1,dim)])
 phi = (np.sqrt(5) + 1) / 2
 print('phi = {:f}\n'.format(phi))
 
+
 ''' generate low-discrepancy sequences with multiple seeds'''
-# #seq = construct.ggs_sequences(seed, num_points)
+seq = construct.ggs_sequences(seed, num_points)
 
 ''' split gs sequence into two '''
 # #seq2 = construct.ggs_sequences(seed, 2*num_points)
@@ -39,13 +40,21 @@ print('phi = {:f}\n'.format(phi))
 # #seq[0] = seq2[0,:num_points]
 # #seq[1] = seq2[0,num_points:]
 
+''' process gs sequence twice '''
+# #ss = (np.arange(num_points) * phi) % 1
+# #seq[0] = (np.arcsin(1 - 2*ss) + np.pi/2) / np.pi
+# #seq[1] = np.arccos(1 - 2*ss) / np.pi
+# #seq[0] = (np.sin(2*np.pi * np.arange(num_points) * phi)) % 1
+# #seq[1] = (np.cos(2*np.pi * np.arange(num_points) * phi)) % 1
+# #seq[0] = (np.arange(num_points) * phi) % 1
+# #seq[1] = (np.arange(num_points)**2 * phi) % 1
+
 ''' subinterval splitting '''
 # #seq = np.zeros((2,num_points))
-# #seq[0] = construct.seq_ratio(num_points, phi)
-# #seq[1] = construct.seq_ratio(num_points, 1)
-seq = construct.ggs_sequences(seed, num_points)
-seq[1] = construct.seq_ratio(num_points, phi)
-
+# #seq[0] = construct.seq_ratio(num_points, phi-1)
+# #seq[1] = construct.seq_ratio(num_points, .5)
+# #seq = construct.ggs_sequences(seed, num_points)
+# #seq[0] = construct.seq_ratio(num_points, phi-1)
 
 ''' interactive lattice '''
 # #alpha = 22# * 180/np.pi
@@ -54,7 +63,7 @@ seq[1] = construct.seq_ratio(num_points, phi)
 # #seq = construct.interactive_lattice(seq, alpha, step)
 
 
-plot_points.plot_sequences(seq, animate=False)
+# #plot_points.plot_sequences(seq, animate=True)
 plot_points.plot_lattice(seq[0], seq[1])
 ''' measure the sequence efficiency '''
 # measure correlation and discrepancy
