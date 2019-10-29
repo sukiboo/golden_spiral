@@ -212,7 +212,6 @@ def interactive_lattice(seq, alpha, step):
 
 	import matplotlib.pyplot as plt
 	from matplotlib.widgets import Slider, Button, TextBox
-	from matplotlib import animation
 
 	# set up figure and configure axes
 	fig = plt.figure(figsize=(10,11))

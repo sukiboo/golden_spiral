@@ -57,10 +57,10 @@ seq = construct.ggs_sequences(seed, num_points)
 # #seq[0] = construct.seq_ratio(num_points, phi-1)
 
 ''' interactive lattice '''
-# #alpha = 22# * 180/np.pi
-# #step = .5
-# #seq = construct.generate_lattice(step, alpha, num_points)
-# #seq = construct.interactive_lattice(seq, alpha, step)
+alpha = 22# * 180/np.pi
+step = .5
+seq = construct.generate_lattice(step, alpha, num_points)
+seq = construct.interactive_lattice(seq, alpha, step)
 
 
 # #plot_points.plot_sequences(seq, animate=True)

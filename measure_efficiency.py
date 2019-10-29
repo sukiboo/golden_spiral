@@ -4,6 +4,7 @@ from scipy.stats.mstats import gmean
 import numpy as np
 
 
+# compute the correlation of sequences
 def sequence_correlation(seq):
 
 	# compute correlation coefficient between every pair of sequences
@@ -17,6 +18,18 @@ def sequence_correlation(seq):
 	return
 
 
+# compute D*-discrepancy of a 1d sequence
+def compute_discrepancy(pts):
+
+	num_pts = pts.shape[0]
+	d_minus = np.abs(np.sort(pts) - np.arange(num_pts) / num_pts)
+	d_plus = np.abs(np.sort(pts) - (np.arange(num_pts) + 1) / num_pts)
+	d = np.amax((d_minus, d_plus))
+
+	return d
+
+
+# compute D*-discrepancy // should be rewritten //
 def sequence_discrepancy(seq, num_tests=10000):
 
 	d, num_points = seq.shape
